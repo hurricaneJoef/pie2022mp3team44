@@ -14,11 +14,17 @@
 #define right_motor_pin 1
 #define thresh_on 690
 #define thresh_off 400
-#define left_speed 50
-#define right_speed 50
-#define cweght 2
-#define fweght 4
-#define tweght 50
+#define isave .9
+
+
+float p =0.2;
+float d =0.0;
+float i =0.00;
+int cweght =2;
+int fweght =4;
+int fspeed =30;
+int tspeed = 60;
+
 
 #include <Adafruit_MotorShield.h>
 
@@ -56,8 +62,8 @@ digitalWrite(crigt_led_pin,HIGH);
 digitalWrite(frigt_led_pin,HIGH);
 left->run(BACKWARD);
 right->run(BACKWARD);
-left->setSpeed(left_speed);
-right->setSpeed(right_speed);
+left->setSpeed(fspeed);
+right->setSpeed(fspeed);
 delay(100);
 left->run(RELEASE);
 right->run(RELEASE);
@@ -75,18 +81,69 @@ void motors(int l,int r){
   }else{
     right->run(FORWARD);
   }
-  left->setSpeed(l);
-  right->setSpeed(r);
-  Serial.print("|  ");
+  left->setSpeed(abs(l));
+  right->setSpeed(abs(r));
+  Serial.print(",|,  ");
   Serial.print(l);
   Serial.print(", ");
   Serial.print(r);
 }
 
 
-int last_dir = false;// false is right true is left
-
+int last_t=0;//for d
+float d_val;
+int i_holder;
 void loop() {
+  if(Serial.available()>0){
+    char c = Serial.read();
+    switch(c){
+      case 'p':
+        p = Serial.parseFloat();
+        break;
+      case 'd':
+        d = Serial.parseFloat();
+        break;
+      case 'i':
+        i = Serial.parseFloat();
+        break;
+      case 'c':
+        cweght = Serial.parseInt();
+        break;
+      case 'f':
+        fweght = Serial.parseInt();
+        break;
+      case 's':
+        fspeed = Serial.parseInt();
+        break;
+      case 't':
+        tspeed = Serial.parseInt();
+        break;
+      case 'v':
+        Serial.print("float p =");
+        Serial.print(p);
+        Serial.println(";");
+        Serial.print("float d =");
+        Serial.print(d);
+        Serial.println(";");
+        Serial.print("float i =");
+        Serial.print(i);
+        Serial.println(";");
+        Serial.print("int cweght =");
+        Serial.print(cweght);
+        Serial.println(";");
+        Serial.print("int fweght =");
+        Serial.print(fweght);
+        Serial.println(";");
+        Serial.print("int fspeed =");
+        Serial.print(fspeed);
+        Serial.println(";");
+        Serial.print("int tspeed =");
+        Serial.print(tspeed);
+        Serial.println(";");
+        delay(8000);
+        break;
+    }
+  }
   // put your main code here, to run repeatedly:
   int val_cl = analogRead(cleft_pin);
   int val_fr = analogRead(frigt_pin);
@@ -107,19 +164,34 @@ void loop() {
   Serial.print(c_ratio);
   Serial.print(", ");
   Serial.print(f_ratio);
-  int cr_clean = round(10*c_ratio*(f_ratio/abs(f_ratio)));
+  int cr_clean = round(c_ratio*(f_ratio/abs(f_ratio)));
   if(cr_clean == 0){
-    cr_clean = 10*cweght;
+    cr_clean = cweght;
   }
-  int t_ratio = round((
-   //               (f_ratio*10/cr_clean)+
-                  c_ratio+
-                  f_ratio
-                  )/tweght);
+  int t = (
+  //        (f_ratio*10/cr_clean)+
+          c_ratio+
+          f_ratio
+          );
+  float t_ratio = (p*t);
+  
+  d_val = (d*(t-last_t));
+  last_t = t;
+  i_holder = round(t+isave*i_holder);
+  int i_val = round(i_holder*i);
+  int lsped = (fspeed);
+  int rsped = (fspeed);
+  float mdiff = (t_ratio+d_val+i_val)/500;
   Serial.print(",  ");
-  Serial.print(t_ratio);
-  int lsped = round(left_speed+(t_ratio));
-  int rsped = round(right_speed-(t_ratio));
+  Serial.print(mdiff);
+  //if(mdiff > 0){
+    rsped = round(fspeed-tspeed*mdiff);
+  //}
+  //if(mdiff < 0){
+    lsped = round(fspeed+tspeed*mdiff);
+  //}
+  
+  //int rsped = round(right_speed-right_speed*(t_ratio+d_val+i_val));
   motors(lsped,rsped);
   /*
   if(val_fl > thresh_on){//on the line
