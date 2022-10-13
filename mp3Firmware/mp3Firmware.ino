@@ -16,7 +16,9 @@
 #define thresh_off 400
 #define left_speed 50
 #define right_speed 50
-#define oneoverp 20
+#define cweght 2
+#define fweght 4
+#define tweght 50
 
 #include <Adafruit_MotorShield.h>
 
@@ -73,12 +75,12 @@ void motors(int l,int r){
   }else{
     right->run(FORWARD);
   }
+  left->setSpeed(l);
+  right->setSpeed(r);
   Serial.print("|  ");
   Serial.print(l);
   Serial.print(", ");
   Serial.print(r);
-  left->setSpeed(l);
-  right->setSpeed(r);
 }
 
 
@@ -97,9 +99,29 @@ void loop() {
   Serial.print(val_cr);
   Serial.print(", ");
   Serial.print(val_fr);
-
-  
-  //*
+  int f_ratio;
+  int c_ratio;
+  c_ratio = (val_cr-val_cl)*cweght;
+  f_ratio = (val_fr-val_fl)*fweght;
+  Serial.print(",  ");
+  Serial.print(c_ratio);
+  Serial.print(", ");
+  Serial.print(f_ratio);
+  int cr_clean = round(10*c_ratio*(f_ratio/abs(f_ratio)));
+  if(cr_clean == 0){
+    cr_clean = 10*cweght;
+  }
+  int t_ratio = round((
+   //               (f_ratio*10/cr_clean)+
+                  c_ratio+
+                  f_ratio
+                  )/tweght);
+  Serial.print(",  ");
+  Serial.print(t_ratio);
+  int lsped = round(left_speed+(t_ratio));
+  int rsped = round(right_speed-(t_ratio));
+  motors(lsped,rsped);
+  /*
   if(val_fl > thresh_on){//on the line
     left->setSpeed(left_speed);
     right->setSpeed(right_speed);
