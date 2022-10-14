@@ -1,4 +1,4 @@
-<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">  1
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">  1
   2
   3
   4
@@ -225,232 +225,236 @@
 225
 226
 227
-228</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #BC7A00">#include &lt;Adafruit_MotorShield.h&gt;</span>
-
-<span style="color: #BC7A00">#define cleft_pin A2 </span><span style="color: #408080; font-style: italic">// c stands for center</span>
-<span style="color: #BC7A00">#define crigt_pin A1</span>
-<span style="color: #BC7A00">#define fleft_pin A0 </span><span style="color: #408080; font-style: italic">// f stands for far</span>
-<span style="color: #BC7A00">#define frigt_pin A3 </span><span style="color: #408080; font-style: italic">// i spelt it rigt b/c i wanted it to match the 4 letters of left</span>
-
-<span style="color: #BC7A00">#define cleft_led_pin 4 </span><span style="color: #408080; font-style: italic">// the pin to turn on the emiter</span>
-<span style="color: #BC7A00">#define fleft_led_pin 5</span>
-<span style="color: #BC7A00">#define crigt_led_pin 7</span>
-<span style="color: #BC7A00">#define frigt_led_pin 6</span>
-
-<span style="color: #BC7A00">#define left_motor_pin 2 </span><span style="color: #408080; font-style: italic">// the connecter the motor is hooked up to</span>
-<span style="color: #BC7A00">#define right_motor_pin 1</span>
-<span style="color: #BC7A00">#define thresh_on 690 </span><span style="color: #408080; font-style: italic">//  for previous bang bang code</span>
-<span style="color: #BC7A00">#define thresh_off 400</span>
-<span style="color: #BC7A00">#define isave .9 </span><span style="color: #408080; font-style: italic">// for the i factor</span>
-
-
-<span style="color: #B00040">float</span> p <span style="color: #666666">=0.2</span>;<span style="color: #408080; font-style: italic">//for pid controller</span>
-<span style="color: #B00040">float</span> d <span style="color: #666666">=0.0</span>;
-<span style="color: #B00040">float</span> i <span style="color: #666666">=0.00</span>;
-<span style="color: #B00040">int</span> cweght <span style="color: #666666">=2</span>; <span style="color: #408080; font-style: italic">//  the weight of the center sensors</span>
-<span style="color: #B00040">int</span> fweght <span style="color: #666666">=4</span>; <span style="color: #408080; font-style: italic">//   the weight of the far sensors</span>
-<span style="color: #B00040">int</span> fspeed <span style="color: #666666">=40</span>; <span style="color: #408080; font-style: italic">// forward speed</span>
-<span style="color: #B00040">int</span> tspeed <span style="color: #666666">=</span> <span style="color: #666666">60</span>; <span style="color: #408080; font-style: italic">//  turning speed</span>
-
-
-<span style="color: #BC7A00">#include &lt;Adafruit_MotorShield.h&gt;</span>
-
-<span style="color: #408080; font-style: italic">// Create the motor shield object with the default I2C address</span>
-Adafruit_MotorShield AFMS <span style="color: #666666">=</span> Adafruit_MotorShield();
-<span style="color: #408080; font-style: italic">// Or, create it with a different I2C address (say for stacking)</span>
-<span style="color: #408080; font-style: italic">// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);</span>
-
-<span style="color: #408080; font-style: italic">// Select which &#39;port&#39; M1, M2, M3 or M4. In this case, M1</span>
-Adafruit_DCMotor <span style="color: #666666">*</span>left <span style="color: #666666">=</span> AFMS.getMotor(left_motor_pin);
-Adafruit_DCMotor <span style="color: #666666">*</span>right <span style="color: #666666">=</span> AFMS.getMotor(right_motor_pin);
-
-<span style="color: #408080; font-style: italic">// You can also make another motor on port M2</span>
-<span style="color: #408080; font-style: italic">//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);</span>
-
-<span style="color: #B00040">void</span> <span style="color: #0000FF">setup</span>() {
-  <span style="color: #408080; font-style: italic">// put your setup code here, to run once:</span>
-Serial.begin(<span style="color: #666666">115200</span>);
-pinMode(cleft_pin,INPUT);<span style="color: #408080; font-style: italic">// init all sensor pins</span>
-pinMode(cleft_led_pin,OUTPUT);
-pinMode(fleft_pin,INPUT);
-pinMode(fleft_led_pin,OUTPUT);
-pinMode(crigt_pin,INPUT);
-pinMode(crigt_led_pin,OUTPUT);
-pinMode(frigt_pin,INPUT);
-pinMode(frigt_led_pin,OUTPUT);
- <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span>AFMS.begin()) {         <span style="color: #408080; font-style: italic">// create with the default frequency 1.6KHz</span>
-  <span style="color: #408080; font-style: italic">// if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz</span>
-    Serial.println(<span style="color: #BA2121">&quot;Could not find Motor Shield. Check wiring.&quot;</span>);
-    <span style="color: #008000; font-weight: bold">while</span> (<span style="color: #666666">1</span>);
-  }
-digitalWrite(fleft_led_pin,HIGH);<span style="color: #408080; font-style: italic">// set the pins high</span>
-digitalWrite(cleft_led_pin,HIGH); <span style="color: #408080; font-style: italic">//  thought i might need to multiplex them but i didnt need to</span>
-digitalWrite(crigt_led_pin,HIGH);
-digitalWrite(frigt_led_pin,HIGH);
-left<span style="color: #666666">-&gt;</span>run(BACKWARD);
-right<span style="color: #666666">-&gt;</span>run(BACKWARD);
-left<span style="color: #666666">-&gt;</span>setSpeed(fspeed);
-right<span style="color: #666666">-&gt;</span>setSpeed(fspeed); <span style="color: #408080; font-style: italic">//lurch it so i know its on</span>
-delay(<span style="color: #666666">100</span>);
-left<span style="color: #666666">-&gt;</span>run(RELEASE);
-right<span style="color: #666666">-&gt;</span>run(RELEASE);
-delay(<span style="color: #666666">5000</span>); <span style="color: #408080; font-style: italic">// wait to start</span>
-}
-
-<span style="color: #B00040">void</span> <span style="color: #0000FF">motors</span>(<span style="color: #B00040">int</span> l,<span style="color: #B00040">int</span> r){<span style="color: #408080; font-style: italic">// get around the issue that you cant set a neg speed</span>
-  <span style="color: #008000; font-weight: bold">if</span>(l<span style="color: #666666">&lt;0</span>){
-    left<span style="color: #666666">-&gt;</span>run(BACKWARD);
-  }<span style="color: #008000; font-weight: bold">else</span>{
-    left<span style="color: #666666">-&gt;</span>run(FORWARD);
-  }
-  <span style="color: #008000; font-weight: bold">if</span>(r<span style="color: #666666">&lt;0</span>){
-    right<span style="color: #666666">-&gt;</span>run(BACKWARD);
-  }<span style="color: #008000; font-weight: bold">else</span>{
-    right<span style="color: #666666">-&gt;</span>run(FORWARD);
-  }
-  left<span style="color: #666666">-&gt;</span>setSpeed(abs(l)); <span style="color: #408080; font-style: italic">// and print the speeds</span>
-  right<span style="color: #666666">-&gt;</span>setSpeed(abs(r));
-  Serial.print(<span style="color: #BA2121">&quot;,|,  &quot;</span>);
-  Serial.print(l);
-  Serial.print(<span style="color: #BA2121">&quot;, &quot;</span>);
-  Serial.print(r);
-}
-
-
-<span style="color: #B00040">int</span> <span style="color: #B00040">last_t</span><span style="color: #666666">=0</span>;<span style="color: #408080; font-style: italic">//for d</span>
-<span style="color: #B00040">float</span> d_val;
-<span style="color: #B00040">int</span> i_holder; <span style="color: #408080; font-style: italic">//keeps track of the i without the coef</span>
-<span style="color: #B00040">void</span> <span style="color: #0000FF">loop</span>() {
-  <span style="color: #008000; font-weight: bold">if</span>(Serial.available()<span style="color: #666666">&gt;0</span>){<span style="color: #408080; font-style: italic">//handle serial data</span>
-    <span style="color: #B00040">char</span> c <span style="color: #666666">=</span> Serial.read();
-    <span style="color: #008000; font-weight: bold">switch</span>(c){
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;p&#39;</span>:<span style="color: #408080; font-style: italic">//set p coef</span>
-        p <span style="color: #666666">=</span> Serial.parseFloat();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;d&#39;</span>:<span style="color: #408080; font-style: italic">//set p coef</span>
-        d <span style="color: #666666">=</span> Serial.parseFloat();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;i&#39;</span>:<span style="color: #408080; font-style: italic">//set p coef</span>
-        i <span style="color: #666666">=</span> Serial.parseFloat();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;c&#39;</span>:<span style="color: #408080; font-style: italic">//set center weight coef</span>
-        cweght <span style="color: #666666">=</span> Serial.parseInt();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;f&#39;</span>:<span style="color: #408080; font-style: italic">//set far weight coef</span>
-        fweght <span style="color: #666666">=</span> Serial.parseInt();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;s&#39;</span>: <span style="color: #408080; font-style: italic">//set forward speed</span>
-        fspeed <span style="color: #666666">=</span> Serial.parseInt();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;t&#39;</span>:<span style="color: #408080; font-style: italic">//set turning speed</span>
-        tspeed <span style="color: #666666">=</span> Serial.parseInt();
-        <span style="color: #008000; font-weight: bold">break</span>;
-      <span style="color: #008000; font-weight: bold">case</span> <span style="color: #BA2121">&#39;v&#39;</span>: <span style="color: #408080; font-style: italic">// print code that i can copy and paste into arduino</span>
-                <span style="color: #408080; font-style: italic">// i could have saved in eeprom but was lazy</span>
-        Serial.print(<span style="color: #BA2121">&quot;float p =&quot;</span>);
-        Serial.print(p);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        Serial.print(<span style="color: #BA2121">&quot;float d =&quot;</span>);
-        Serial.print(d);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        Serial.print(<span style="color: #BA2121">&quot;float i =&quot;</span>);
-        Serial.print(i);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        Serial.print(<span style="color: #BA2121">&quot;int cweght =&quot;</span>);
-        Serial.print(cweght);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        Serial.print(<span style="color: #BA2121">&quot;int fweght =&quot;</span>);
-        Serial.print(fweght);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        Serial.print(<span style="color: #BA2121">&quot;int fspeed =&quot;</span>);
-        Serial.print(fspeed);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        Serial.print(<span style="color: #BA2121">&quot;int tspeed =&quot;</span>);
-        Serial.print(tspeed);
-        Serial.println(<span style="color: #BA2121">&quot;;&quot;</span>);
-        delay(<span style="color: #666666">8000</span>);
-        <span style="color: #008000; font-weight: bold">break</span>;
-    }
-  }
-  <span style="color: #408080; font-style: italic">// put your main code here, to run repeatedly:</span>
-  <span style="color: #B00040">int</span> val_cl <span style="color: #666666">=</span> analogRead(cleft_pin);
-  <span style="color: #B00040">int</span> val_fr <span style="color: #666666">=</span> analogRead(frigt_pin);
-  <span style="color: #B00040">int</span> val_cr <span style="color: #666666">=</span> analogRead(crigt_pin);<span style="color: #408080; font-style: italic">//read once save time</span>
-  <span style="color: #B00040">int</span> val_fl <span style="color: #666666">=</span> analogRead(fleft_pin);
-  Serial.print(val_fl);
-  Serial.print(<span style="color: #BA2121">&quot;, &quot;</span>);
-  Serial.print(val_cl);
-  Serial.print(<span style="color: #BA2121">&quot;, &quot;</span>);
-  Serial.print(val_cr);
-  Serial.print(<span style="color: #BA2121">&quot;, &quot;</span>);
-  Serial.print(val_fr);<span style="color: #408080; font-style: italic">//print vals</span>
-  <span style="color: #B00040">int</span> f_ratio;
-  <span style="color: #B00040">int</span> c_ratio;
-  c_ratio <span style="color: #666666">=</span> (val_cr<span style="color: #666666">-</span>val_cl)<span style="color: #666666">*</span>cweght;<span style="color: #408080; font-style: italic">//get ratios</span>
-  f_ratio <span style="color: #666666">=</span> (val_fr<span style="color: #666666">-</span>val_fl)<span style="color: #666666">*</span>fweght;
-  Serial.print(<span style="color: #BA2121">&quot;,  &quot;</span>);
-  Serial.print(c_ratio);
-  Serial.print(<span style="color: #BA2121">&quot;, &quot;</span>);
-  Serial.print(f_ratio);
-  <span style="color: #B00040">int</span> cr_clean <span style="color: #666666">=</span> round(c_ratio<span style="color: #666666">*</span>(f_ratio<span style="color: #666666">/</span>abs(f_ratio)));<span style="color: #408080; font-style: italic">// this was to remove wierd vals and prep for (f/c)+f+c idea that didnt pan out</span>
-  <span style="color: #008000; font-weight: bold">if</span>(cr_clean <span style="color: #666666">==</span> <span style="color: #666666">0</span>){
-    cr_clean <span style="color: #666666">=</span> cweght;
-  }
-  <span style="color: #B00040">int</span> t <span style="color: #666666">=</span> (<span style="color: #408080; font-style: italic">//make a sum of c and f differneces </span>
-  <span style="color: #408080; font-style: italic">//        (f_ratio*10/cr_clean)+// didnt pan out </span>
-          c_ratio<span style="color: #666666">+</span>
-          f_ratio
-          );
-  <span style="color: #B00040">float</span> t_ratio <span style="color: #666666">=</span> (p<span style="color: #666666">*</span>t);<span style="color: #408080; font-style: italic">//p value</span>
-  
-  d_val <span style="color: #666666">=</span> (d<span style="color: #666666">*</span>(t<span style="color: #666666">-</span><span style="color: #B00040">last_t</span>));<span style="color: #408080; font-style: italic">// getting d from last value of t</span>
-  <span style="color: #B00040">last_t</span> <span style="color: #666666">=</span> t;<span style="color: #408080; font-style: italic">// set last t for d next run</span>
-  i_holder <span style="color: #666666">=</span> round(t<span style="color: #666666">+</span>isave<span style="color: #666666">*</span>i_holder);<span style="color: #408080; font-style: italic">//save the integration total for later</span>
-  <span style="color: #B00040">float</span> i_val <span style="color: #666666">=</span> (i_holder<span style="color: #666666">*</span>i);<span style="color: #408080; font-style: italic">//get i val</span>
-  <span style="color: #B00040">int</span> lsped <span style="color: #666666">=</span> (fspeed);<span style="color: #408080; font-style: italic">// set values for old code no longer used</span>
-  <span style="color: #B00040">int</span> rsped <span style="color: #666666">=</span> (fspeed);
-  <span style="color: #B00040">float</span> mdiff <span style="color: #666666">=</span> (t_ratio<span style="color: #666666">+</span>d_val<span style="color: #666666">+</span>i_val)<span style="color: #666666">/500</span>;<span style="color: #408080; font-style: italic">// get diff to turn by</span>
-  Serial.print(<span style="color: #BA2121">&quot;,  &quot;</span>);
-  Serial.print(mdiff);
-  <span style="color: #408080; font-style: italic">//if(mdiff &gt; 0){</span>
-    rsped <span style="color: #666666">=</span> round(fspeed<span style="color: #666666">-</span>tspeed<span style="color: #666666">*</span>mdiff);<span style="color: #408080; font-style: italic">// set speeds</span>
-  <span style="color: #408080; font-style: italic">//}</span>
-  <span style="color: #408080; font-style: italic">//if(mdiff &lt; 0){</span>
-    lsped <span style="color: #666666">=</span> round(fspeed<span style="color: #666666">+</span>tspeed<span style="color: #666666">*</span>mdiff);
-  <span style="color: #408080; font-style: italic">//}</span>
-  
-  <span style="color: #408080; font-style: italic">//int rsped = round(right_speed-right_speed*(t_ratio+d_val+i_val));</span>
-  motors(lsped,rsped);<span style="color: #408080; font-style: italic">// and push speeds to motors</span>
-  <span style="color: #408080; font-style: italic">/*</span>
-<span style="color: #408080; font-style: italic">  if(val_fl &gt; thresh_on){//on the line</span>
-<span style="color: #408080; font-style: italic">    left-&gt;setSpeed(left_speed);</span>
-<span style="color: #408080; font-style: italic">    right-&gt;setSpeed(right_speed);</span>
-<span style="color: #408080; font-style: italic">    if(val_fr &gt; thresh_on){</span>
-<span style="color: #408080; font-style: italic">      right-&gt;run(RELEASE);</span>
-<span style="color: #408080; font-style: italic">      right-&gt;run(BRAKE);</span>
-<span style="color: #408080; font-style: italic">      left-&gt;run(RELEASE);</span>
-<span style="color: #408080; font-style: italic">      left-&gt;run(BRAKE);</span>
-<span style="color: #408080; font-style: italic">      delay(1000);</span>
-<span style="color: #408080; font-style: italic">      right-&gt;run(FORWARD);</span>
-<span style="color: #408080; font-style: italic">      left-&gt;run(FORWARD);</span>
-<span style="color: #408080; font-style: italic">    }else if(val_fr&lt; thresh_off){</span>
-<span style="color: #408080; font-style: italic">      right-&gt;run(FORWARD);</span>
-<span style="color: #408080; font-style: italic">      left-&gt;run(BACKWARD);</span>
-<span style="color: #408080; font-style: italic">    }</span>
-<span style="color: #408080; font-style: italic">  }else if(val_fl&lt; thresh_off){// off the line</span>
-<span style="color: #408080; font-style: italic">    if(val_fr &gt; thresh_on){</span>
-<span style="color: #408080; font-style: italic">      left-&gt;setSpeed(left_speed);</span>
-<span style="color: #408080; font-style: italic">      right-&gt;setSpeed(right_speed);</span>
-<span style="color: #408080; font-style: italic">      right-&gt;run(BACKWARD);</span>
-<span style="color: #408080; font-style: italic">      left-&gt;run(FORWARD);</span>
-<span style="color: #408080; font-style: italic">    }else if(val_fr&lt; thresh_off){</span>
-<span style="color: #408080; font-style: italic">        int ratio = val_cr-val_cl; </span>
-<span style="color: #408080; font-style: italic">        int lsped = round(left_speed+(ratio/oneoverp));</span>
-<span style="color: #408080; font-style: italic">        int rsped = round(right_speed-(ratio/oneoverp));</span>
-<span style="color: #408080; font-style: italic">        motors(lsped,rsped);</span>
-<span style="color: #408080; font-style: italic">      </span>
-<span style="color: #408080; font-style: italic">    }</span>
-<span style="color: #408080; font-style: italic">  }//*/</span>
-  Serial.println(<span style="color: #BA2121">&quot;.&quot;</span>);<span style="color: #408080; font-style: italic">// end serial line</span>
-}
+228
+229
+230</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #557799">#include &lt;Adafruit_MotorShield.h&gt; </span>
+ 
+<span style="color: #557799">#define cleft_pin A2 </span><span style="color: #888888">// c stands for center </span>
+<span style="color: #557799">#define crigt_pin A1 </span>
+<span style="color: #557799">#define fleft_pin A0 </span><span style="color: #888888">// f stands for far </span>
+<span style="color: #557799">#define frigt_pin A3 </span><span style="color: #888888">// we spelt it rigt b/c we wanted it to match the 4 letters of left </span>
+ 
+<span style="color: #557799">#define cleft_led_pin 4 </span><span style="color: #888888">// the pin to turn on the emitter </span>
+<span style="color: #557799">#define fleft_led_pin 5 </span>
+<span style="color: #557799">#define crigt_led_pin 7 </span>
+<span style="color: #557799">#define frigt_led_pin 6 </span>
+ 
+<span style="color: #557799">#define left_motor_pin 2 </span><span style="color: #888888">// the connecter the motor is hooked up to </span>
+<span style="color: #557799">#define right_motor_pin 1 </span>
+<span style="color: #557799">#define thresh_on 690 </span><span style="color: #888888">// for previous bang bang code </span>
+<span style="color: #557799">#define thresh_off 400 </span>
+<span style="color: #557799">#define isave .9 </span><span style="color: #888888">// for the i factor </span>
+ 
+ 
+<span style="color: #333399; font-weight: bold">float</span> p <span style="color: #333333">=</span><span style="color: #6600EE; font-weight: bold">0.2</span>;<span style="color: #888888">// for pid controller </span>
+<span style="color: #333399; font-weight: bold">float</span> d <span style="color: #333333">=</span><span style="color: #6600EE; font-weight: bold">0.0</span>; 
+<span style="color: #333399; font-weight: bold">float</span> i <span style="color: #333333">=</span><span style="color: #6600EE; font-weight: bold">0.00</span>; 
+<span style="color: #333399; font-weight: bold">int</span> cweght <span style="color: #333333">=</span><span style="color: #0000DD; font-weight: bold">2</span>; <span style="color: #888888">// the weight of the center sensors </span>
+<span style="color: #333399; font-weight: bold">int</span> fweght <span style="color: #333333">=</span><span style="color: #0000DD; font-weight: bold">4</span>; <span style="color: #888888">// the weight of the far sensors </span>
+<span style="color: #333399; font-weight: bold">int</span> fspeed <span style="color: #333333">=</span><span style="color: #0000DD; font-weight: bold">40</span>; <span style="color: #888888">// forward speed </span>
+<span style="color: #333399; font-weight: bold">int</span> tspeed <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">60</span>; <span style="color: #888888">// turning speed </span>
+ 
+ 
+<span style="color: #557799">#include &lt;Adafruit_MotorShield.h&gt; </span>
+ 
+<span style="color: #888888">// Create the motor shield object with the default I2C address </span>
+Adafruit_MotorShield AFMS <span style="color: #333333">=</span> Adafruit_MotorShield(); 
+<span style="color: #888888">// Or, create it with a different I2C address (say for stacking) </span>
+<span style="color: #888888">// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); </span>
+ 
+<span style="color: #888888">// Select which &#39;port&#39; M1, M2, M3 or M4. In this case, M1 </span>
+Adafruit_DCMotor <span style="color: #333333">*</span>left <span style="color: #333333">=</span> AFMS.getMotor(left_motor_pin); 
+Adafruit_DCMotor <span style="color: #333333">*</span>right <span style="color: #333333">=</span> AFMS.getMotor(right_motor_pin); 
+ 
+<span style="color: #888888">// You can also make another motor on port M2 </span>
+<span style="color: #888888">//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2); </span>
+ 
+<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">setup</span>() { 
+  <span style="color: #888888">// put your setup code here, to run once: </span>
+Serial.begin(<span style="color: #0000DD; font-weight: bold">115200</span>); 
+pinMode(cleft_pin,INPUT);<span style="color: #888888">// init all sensor pins </span>
+pinMode(cleft_led_pin,OUTPUT); 
+pinMode(fleft_pin,INPUT); 
+pinMode(fleft_led_pin,OUTPUT); 
+pinMode(crigt_pin,INPUT); 
+pinMode(crigt_led_pin,OUTPUT); 
+pinMode(frigt_pin,INPUT); 
+pinMode(frigt_led_pin,OUTPUT); 
+ <span style="color: #008800; font-weight: bold">if</span> (<span style="color: #333333">!</span>AFMS.begin()) {         <span style="color: #888888">// create with the default frequency 1.6KHz </span>
+  <span style="color: #888888">// if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz </span>
+    Serial.println(<span style="background-color: #fff0f0">&quot;Could not find Motor Shield. Check wiring.&quot;</span>); 
+    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>); 
+  } 
+digitalWrite(fleft_led_pin,HIGH); <span style="color: #888888">// set the pins high </span>
+digitalWrite(cleft_led_pin,HIGH); 
+<span style="color: #888888">// thought we might need to multiplex them but we didn&#39;t need to </span>
+digitalWrite(crigt_led_pin,HIGH); 
+digitalWrite(frigt_led_pin,HIGH); 
+left<span style="color: #333333">-&gt;</span>run(BACKWARD); 
+right<span style="color: #333333">-&gt;</span>run(BACKWARD); 
+left<span style="color: #333333">-&gt;</span>setSpeed(fspeed); 
+right<span style="color: #333333">-&gt;</span>setSpeed(fspeed); <span style="color: #888888">//lurch it so we know it&#39;s on </span>
+delay(<span style="color: #0000DD; font-weight: bold">100</span>); 
+left<span style="color: #333333">-&gt;</span>run(RELEASE); 
+right<span style="color: #333333">-&gt;</span>run(RELEASE); 
+delay(<span style="color: #0000DD; font-weight: bold">5000</span>); <span style="color: #888888">// wait to start </span>
+} 
+ 
+<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">motors</span>(<span style="color: #333399; font-weight: bold">int</span> l,<span style="color: #333399; font-weight: bold">int</span> r){ <span style="color: #888888">// get around the issue that you can&#39;t set a neg speed </span>
+  <span style="color: #008800; font-weight: bold">if</span>(l<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">0</span>){ 
+    left<span style="color: #333333">-&gt;</span>run(BACKWARD); 
+  }<span style="color: #008800; font-weight: bold">else</span>{ 
+    left<span style="color: #333333">-&gt;</span>run(FORWARD); 
+  } 
+  <span style="color: #008800; font-weight: bold">if</span>(r<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">0</span>){ 
+    right<span style="color: #333333">-&gt;</span>run(BACKWARD); 
+  }<span style="color: #008800; font-weight: bold">else</span>{ 
+    right<span style="color: #333333">-&gt;</span>run(FORWARD); 
+  } 
+  left<span style="color: #333333">-&gt;</span>setSpeed(abs(l)); <span style="color: #888888">// and print the speeds </span>
+  right<span style="color: #333333">-&gt;</span>setSpeed(abs(r)); 
+  Serial.print(<span style="background-color: #fff0f0">&quot;,|,  &quot;</span>); 
+  Serial.print(l); 
+  Serial.print(<span style="background-color: #fff0f0">&quot;, &quot;</span>); 
+  Serial.print(r); 
+} 
+ 
+ 
+<span style="color: #333399; font-weight: bold">int</span> <span style="color: #333399; font-weight: bold">last_t</span><span style="color: #333333">=</span><span style="color: #0000DD; font-weight: bold">0</span>; <span style="color: #888888">//for d </span>
+<span style="color: #333399; font-weight: bold">float</span> d_val; 
+<span style="color: #333399; font-weight: bold">int</span> i_holder; <span style="color: #888888">//keeps track of the i without the coef </span>
+<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>() { 
+  <span style="color: #008800; font-weight: bold">if</span>(Serial.available()<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">0</span>){ <span style="color: #888888">//handle serial data </span>
+    <span style="color: #333399; font-weight: bold">char</span> c <span style="color: #333333">=</span> Serial.read(); 
+    <span style="color: #008800; font-weight: bold">switch</span>(c){ 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;p&#39;</span>:<span style="color: #888888">//set p coef </span>
+        p <span style="color: #333333">=</span> Serial.parseFloat(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;d&#39;</span>:<span style="color: #888888">//set p coef </span>
+        d <span style="color: #333333">=</span> Serial.parseFloat(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;i&#39;</span>:<span style="color: #888888">//set p coef </span>
+        i <span style="color: #333333">=</span> Serial.parseFloat(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;c&#39;</span>:<span style="color: #888888">//set center weight coef </span>
+        cweght <span style="color: #333333">=</span> Serial.parseInt(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;f&#39;</span>:<span style="color: #888888">//set far weight coef </span>
+        fweght <span style="color: #333333">=</span> Serial.parseInt(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;s&#39;</span>: <span style="color: #888888">//set forward speed </span>
+        fspeed <span style="color: #333333">=</span> Serial.parseInt(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;t&#39;</span>:<span style="color: #888888">//set turning speed </span>
+        tspeed <span style="color: #333333">=</span> Serial.parseInt(); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+      <span style="color: #008800; font-weight: bold">case</span> <span style="color: #0044DD">&#39;v&#39;</span>: <span style="color: #888888">// print code that we can copy and paste into Arduino </span>
+                 
+        Serial.print(<span style="background-color: #fff0f0">&quot;float p =&quot;</span>); 
+        Serial.print(p); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        Serial.print(<span style="background-color: #fff0f0">&quot;float d =&quot;</span>); 
+        Serial.print(d); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        Serial.print(<span style="background-color: #fff0f0">&quot;float i =&quot;</span>); 
+        Serial.print(i); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        Serial.print(<span style="background-color: #fff0f0">&quot;int cweght =&quot;</span>); 
+        Serial.print(cweght); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        Serial.print(<span style="background-color: #fff0f0">&quot;int fweght =&quot;</span>); 
+        Serial.print(fweght); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        Serial.print(<span style="background-color: #fff0f0">&quot;int fspeed =&quot;</span>); 
+        Serial.print(fspeed); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        Serial.print(<span style="background-color: #fff0f0">&quot;int tspeed =&quot;</span>); 
+        Serial.print(tspeed); 
+        Serial.println(<span style="background-color: #fff0f0">&quot;;&quot;</span>); 
+        delay(<span style="color: #0000DD; font-weight: bold">8000</span>); 
+        <span style="color: #008800; font-weight: bold">break</span>; 
+    } 
+  } 
+  <span style="color: #888888">// put your main code here, to run repeatedly: </span>
+  <span style="color: #333399; font-weight: bold">int</span> val_cl <span style="color: #333333">=</span> analogRead(cleft_pin); 
+  <span style="color: #333399; font-weight: bold">int</span> val_fr <span style="color: #333333">=</span> analogRead(frigt_pin); 
+  <span style="color: #333399; font-weight: bold">int</span> val_cr <span style="color: #333333">=</span> analogRead(crigt_pin); <span style="color: #888888">// read once save time </span>
+  <span style="color: #333399; font-weight: bold">int</span> val_fl <span style="color: #333333">=</span> analogRead(fleft_pin); 
+  Serial.print(val_fl); 
+  Serial.print(<span style="background-color: #fff0f0">&quot;, &quot;</span>); 
+  Serial.print(val_cl); 
+  Serial.print(<span style="background-color: #fff0f0">&quot;, &quot;</span>); 
+  Serial.print(val_cr); 
+  Serial.print(<span style="background-color: #fff0f0">&quot;, &quot;</span>); 
+  Serial.print(val_fr); <span style="color: #888888">// print vals </span>
+  <span style="color: #333399; font-weight: bold">int</span> f_ratio; 
+  <span style="color: #333399; font-weight: bold">int</span> c_ratio; 
+  c_ratio <span style="color: #333333">=</span> (val_cr<span style="color: #333333">-</span>val_cl)<span style="color: #333333">*</span>cweght; <span style="color: #888888">// get ratios </span>
+  f_ratio <span style="color: #333333">=</span> (val_fr<span style="color: #333333">-</span>val_fl)<span style="color: #333333">*</span>fweght; 
+  Serial.print(<span style="background-color: #fff0f0">&quot;,  &quot;</span>); 
+  Serial.print(c_ratio); 
+  Serial.print(<span style="background-color: #fff0f0">&quot;, &quot;</span>); 
+  Serial.print(f_ratio); 
+<span style="color: #888888">// this was to remove wierd vals and prep for (f/c)+f+c idea that didn&#39;t pan out </span>
+  <span style="color: #333399; font-weight: bold">int</span> cr_clean <span style="color: #333333">=</span> round(c_ratio<span style="color: #333333">*</span>(f_ratio<span style="color: #333333">/</span>abs(f_ratio))); 
+  <span style="color: #008800; font-weight: bold">if</span>(cr_clean <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">0</span>){ 
+    cr_clean <span style="color: #333333">=</span> cweght; 
+  } 
+  <span style="color: #333399; font-weight: bold">int</span> t <span style="color: #333333">=</span> ( <span style="color: #888888">// make a sum of c and f differences  </span>
+  <span style="color: #888888">//        (f_ratio*10/cr_clean)+// didnt pan out  </span>
+          c_ratio<span style="color: #333333">+</span> 
+          f_ratio 
+          ); 
+  <span style="color: #333399; font-weight: bold">float</span> t_ratio <span style="color: #333333">=</span> (p<span style="color: #333333">*</span>t);<span style="color: #888888">//p value </span>
+   
+  d_val <span style="color: #333333">=</span> (d<span style="color: #333333">*</span>(t<span style="color: #333333">-</span><span style="color: #333399; font-weight: bold">last_t</span>)); <span style="color: #888888">// getting d from last value of t </span>
+  <span style="color: #333399; font-weight: bold">last_t</span> <span style="color: #333333">=</span> t; <span style="color: #888888">// set last t for d next run </span>
+  i_holder <span style="color: #333333">=</span> round(t<span style="color: #333333">+</span>isave<span style="color: #333333">*</span>i_holder); <span style="color: #888888">//save the integration total for later </span>
+  <span style="color: #333399; font-weight: bold">float</span> i_val <span style="color: #333333">=</span> (i_holder<span style="color: #333333">*</span>i); <span style="color: #888888">//get i val </span>
+  <span style="color: #333399; font-weight: bold">int</span> lsped <span style="color: #333333">=</span> (fspeed); <span style="color: #888888">// set values for old code no longer used </span>
+  <span style="color: #333399; font-weight: bold">int</span> rsped <span style="color: #333333">=</span> (fspeed); 
+  <span style="color: #333399; font-weight: bold">float</span> mdiff <span style="color: #333333">=</span> (t_ratio<span style="color: #333333">+</span>d_val<span style="color: #333333">+</span>i_val)<span style="color: #333333">/</span><span style="color: #0000DD; font-weight: bold">500</span>;<span style="color: #888888">// get diff to turn by </span>
+  Serial.print(<span style="background-color: #fff0f0">&quot;,  &quot;</span>); 
+  Serial.print(mdiff); 
+  <span style="color: #888888">//if(mdiff &gt; 0){ </span>
+    rsped <span style="color: #333333">=</span> round(fspeed<span style="color: #333333">-</span>tspeed<span style="color: #333333">*</span>mdiff);<span style="color: #888888">// set speeds </span>
+  <span style="color: #888888">//} </span>
+  <span style="color: #888888">//if(mdiff &lt; 0){ </span>
+    lsped <span style="color: #333333">=</span> round(fspeed<span style="color: #333333">+</span>tspeed<span style="color: #333333">*</span>mdiff); 
+  <span style="color: #888888">//} </span>
+   
+  <span style="color: #888888">//int rsped = round(right_speed-right_speed*(t_ratio+d_val+i_val)); </span>
+  motors(lsped,rsped);<span style="color: #888888">// and push speeds to motors </span>
+  <span style="color: #888888">/* </span>
+<span style="color: #888888">  if(val_fl &gt; thresh_on){//on the line </span>
+<span style="color: #888888">    left-&gt;setSpeed(left_speed); </span>
+<span style="color: #888888">    right-&gt;setSpeed(right_speed); </span>
+<span style="color: #888888">    if(val_fr &gt; thresh_on){ </span>
+<span style="color: #888888">      right-&gt;run(RELEASE); </span>
+<span style="color: #888888">      right-&gt;run(BRAKE); </span>
+<span style="color: #888888">      left-&gt;run(RELEASE); </span>
+<span style="color: #888888">      left-&gt;run(BRAKE); </span>
+<span style="color: #888888">      delay(1000); </span>
+<span style="color: #888888">      right-&gt;run(FORWARD); </span>
+<span style="color: #888888">      left-&gt;run(FORWARD); </span>
+<span style="color: #888888">    }else if(val_fr&lt; thresh_off){ </span>
+<span style="color: #888888">      right-&gt;run(FORWARD); </span>
+<span style="color: #888888">      left-&gt;run(BACKWARD); </span>
+<span style="color: #888888">    } </span>
+<span style="color: #888888">  }else if(val_fl&lt; thresh_off){// off the line </span>
+<span style="color: #888888">    if(val_fr &gt; thresh_on){ </span>
+<span style="color: #888888">      left-&gt;setSpeed(left_speed); </span>
+<span style="color: #888888">      right-&gt;setSpeed(right_speed); </span>
+<span style="color: #888888">      right-&gt;run(BACKWARD); </span>
+<span style="color: #888888">      left-&gt;run(FORWARD); </span>
+<span style="color: #888888">    }else if(val_fr&lt; thresh_off){ </span>
+<span style="color: #888888">        int ratio = val_cr-val_cl;  </span>
+<span style="color: #888888">        int lsped = round(left_speed+(ratio/oneoverp)); </span>
+<span style="color: #888888">        int rsped = round(right_speed-(ratio/oneoverp)); </span>
+<span style="color: #888888">        motors(lsped,rsped); </span>
+<span style="color: #888888">       </span>
+<span style="color: #888888">    } </span>
+<span style="color: #888888">  }//*/</span> 
+  Serial.println(<span style="background-color: #fff0f0">&quot;.&quot;</span>);<span style="color: #888888">// end serial line </span>
+} 
 </pre></td></tr></table></div>
